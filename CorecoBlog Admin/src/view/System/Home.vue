@@ -92,10 +92,10 @@
     <div class="coco-tabs">
         <el-tabs v-model="activeName" @tab-click="handleTabsClick">
           <el-tab-pane label="访问趋势" name="first" >
-            <div class="echarts-container" ref="visitorEchartRef"></div>
+            <div v-if="activeName==='first'" class="echarts-container" ref="visitorEchartRef"></div>
           </el-tab-pane>
           <el-tab-pane label="阅读数量" name="second" :lazy="true">
-            <div class="echarts-container" ref="readEchartRef"></div>
+            <div v-if="activeName==='second'" class="echarts-container" ref="readEchartRef"></div>
           </el-tab-pane>
         </el-tabs>
     </div>
@@ -112,7 +112,7 @@ import {ElNotification, TabsPaneContext} from "element-plus/es";
 let totalVisitor = ref(99999);
 let totalReaded = ref(99999);
 let totalArticle = ref(99999);
-let activeName = ref('first');
+const activeName = ref('first');
 
 let getRangeDate=( range: number, type?: string ) =>{
   const formatDate = ( time: any ) => {
@@ -154,20 +154,35 @@ let getRangeDate=( range: number, type?: string ) =>{
 let visitorEchartRef = ref();
 let readEchartRef = ref();
 
+/*标签面板切换*/
 const handleTabsClick = (tab: TabsPaneContext, event: Event) => {
-
+/*如果是阅读数量面板，绘制echart*/
   if (tab.props.label === "阅读数量") {
-    console.log(111);
-    nextTick(()=>{
-      let readEchart = echarts.init(readEchartRef.value);
-      initLineEchart(readEchart);
-    })
+    /*这里加个小延迟是为了让虚拟dom容器先渲染出来，然后在挂载echart图标，因为js是异步执行
+    的，如果不加延迟可能echart挂载的时候，其虚拟DOM容器还没渲染完成，导致echart挂载失败 */
+    setTimeout(()=>{let readEchart = echarts.init(readEchartRef.value);
+      initBarEchart(readEchart);
+      window.onresize = ()=>{
+        readEchart.resize();
+      }},100)
+
+  }
+
+  /*如果是访问趋势面板，绘制echart*/
+  if(tab.props.label==="访问趋势"){
+    setTimeout(() => {
+      let visitorEchart = echarts.init(visitorEchartRef.value);
+      initLineEchart(visitorEchart);
+      window.onresize = () => {
+        visitorEchart.resize();
+      }
+    }, 100);
 
   }
 };
 
 
-//绘制曲线图
+//通过配置选项绘制曲线图
 let initLineEchart = (echartInstance:any) => {
   /*初始化echart实例*/
   echartInstance.setOption({
@@ -187,7 +202,7 @@ let initLineEchart = (echartInstance:any) => {
   });
 }
 
-//绘制柱状图
+//通过配置选项绘制柱状图
 let initBarEchart = (echrtInstance:any)=>{
   echrtInstance.setOption({
     tooltip:{},
@@ -207,13 +222,8 @@ let initBarEchart = (echrtInstance:any)=>{
 onMounted(()=>{
   let visitorEchart = echarts.init(visitorEchartRef.value);
   initLineEchart(visitorEchart);
- /* let readEchart = echarts.init(readEchartRef.value);
-  initLineEchart(readEchart);*/
-  /*initBarEchart(readEchart);*/
-  /*图标大小响应容器大小*/
   window.onresize = () => {
     visitorEchart.resize();
-   /* readEchart.resize();*/
   };
 })
 
