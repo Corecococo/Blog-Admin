@@ -14,12 +14,12 @@ const routes: RouteRecordRaw[] = [
         path: "/coco",
         component: Layout,
         children: [
-            {path:"/coco/home",component:Home},
-            {path:"/coco/blogpublish",component:BlogPublish},
-            {path:"/coco/categorymanager",component:CategoryManager},
-            {path:"/coco/sysmanager",component:SysManager},
-            {path:"/coco/articlemanager",component:ArticleManager},
-            {path:"/coco/workbench",component:Workbench},
+            {path:"/coco/home",component:Home,meta:{name:'Home'}},
+            {path:"/coco/blogpublish",component:BlogPublish,meta:{name:'BlogPublish'}},
+            {path:"/coco/categorymanager",component:CategoryManager,meta:{name:'CategoryManager'}},
+            {path:"/coco/sysmanager",component:SysManager,meta:{name:'SysManager'}},
+            {path:"/coco/articlemanager",component:ArticleManager,meta:{name:'ArticleManager'}},
+            {path:"/coco/workbench",component:Workbench,meta:{name:'Workbench'}},
         ]
     }
 ]

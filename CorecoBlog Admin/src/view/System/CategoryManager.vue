@@ -23,11 +23,11 @@
       title="创建分类"
       width="30%"
   >
-   <el-form>
-     <el-form-item label="分类名">
-       <el-input></el-input>
-     </el-form-item>
-   </el-form>
+    <el-form>
+      <el-form-item label="分类名">
+        <el-input></el-input>
+      </el-form-item>
+    </el-form>
 
     <template #footer>
       <el-button @click="createCategory" type="primary" size="small">确定</el-button>

@@ -100,6 +100,25 @@
         </el-tabs>
     </div>
 
+    <div class="card-list">
+      <el-card class="echart-box">
+        <template #header>
+          <div><span>
+            博客占比
+          </span></div>
+        </template>
+        <div class="echarts-container" ref="percentEchartsRef"></div>
+      </el-card>
+
+      <el-card class="echart-box">
+        <template #header>
+          <div>
+            <span>阅读排行</span>
+          </div>
+        </template>
+        <div class="echarts-container" ref="rankEchartsRef"></div>
+      </el-card>
+    </div>
 
   </div>
 </template>
@@ -153,6 +172,8 @@ let getRangeDate=( range: number, type?: string ) =>{
 /*echart虚拟Dom*/
 let visitorEchartRef = ref();
 let readEchartRef = ref();
+const percentEchartsRef = ref();
+const rankEchartsRef = ref();
 
 /*标签面板切换*/
 const handleTabsClick = (tab: TabsPaneContext, event: Event) => {
@@ -182,7 +203,7 @@ const handleTabsClick = (tab: TabsPaneContext, event: Event) => {
 };
 
 
-//通过配置选项绘制曲线图
+//通过配置选项绘制访问趋势曲线图
 let initLineEchart = (echartInstance:any) => {
   /*初始化echart实例*/
   echartInstance.setOption({
@@ -202,7 +223,7 @@ let initLineEchart = (echartInstance:any) => {
   });
 }
 
-//通过配置选项绘制柱状图
+//通过配置选项绘制阅读数量柱状图
 let initBarEchart = (echrtInstance:any)=>{
   echrtInstance.setOption({
     tooltip:{},
@@ -219,11 +240,68 @@ let initBarEchart = (echrtInstance:any)=>{
   });
 }
 
+//通过配置选项绘制博客占比饼状图
+const initPieEchart = (echartInstance:any)=>{
+  echartInstance.setOption({
+    series:[{
+      type:'pie',
+      data:[
+        {
+          value: 78,
+          name:"HTML5"
+        },
+        {
+          value: 88,
+          name:"CSS3"
+        },
+        {
+          value: 78,
+          name:"JS"
+        },{
+          value: 98,
+          name:"Vue3"
+        },
+        {
+          value: 108,
+          name:"APS.NET Core"
+        }
+      ]
+    }]
+  });
+}
+
+//TODO 通过配置选项绘制阅读排行柱状图
+const initRankEcharts = (echartInstance:any)=>{
+  echartInstance.setOption({
+    yAxis:{
+      data:['HTML5','CSS3','JS','Vue3','.NET']
+    },
+    xAxis: {},
+    series:[
+      {
+        type:'bar',
+        //排序逻辑从小到大，显示效果比较直观
+        data:[55,66,77,88,99]
+      }
+    ]
+  });
+}
+
 onMounted(()=>{
+  /*初始化访问趋势图*/
   let visitorEchart = echarts.init(visitorEchartRef.value);
   initLineEchart(visitorEchart);
+
+  /*初始化博客占比图*/
+  const percentEchart = echarts.init(percentEchartsRef.value);
+  initPieEchart(percentEchart);
+
+  //初始化阅读排行图
+  const rankEchart = echarts.init(rankEchartsRef.value);
+  initRankEcharts(rankEchart);
   window.onresize = () => {
     visitorEchart.resize();
+    percentEchart.resize();
   };
 })
 
@@ -243,6 +321,11 @@ onMounted(()=>{
 
 .box-card {
   width: 30%;
+}
+
+.echart-box{
+  width: 48%;
+  margin-top: 1.5rem;
 }
 
 :deep(.el-card__header) {

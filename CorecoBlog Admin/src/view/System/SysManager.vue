@@ -1,5 +1,5 @@
 <template>
-系统管理
+    系统管理
 </template>
 
 <script>

@@ -1,5 +1,5 @@
 <template>
-工作台
+  工作台
 </template>
 
 <script>
