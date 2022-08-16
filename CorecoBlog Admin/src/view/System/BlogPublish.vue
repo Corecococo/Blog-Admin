@@ -8,6 +8,10 @@
         <el-input placeholder="Author" v-model="blogData.author"></el-input>
       </el-form-item>
 
+      <el-form-item label="博客贡献">
+        <el-input placeholder="Contribution" v-model="blogData.contribution"></el-input>
+      </el-form-item>
+
       <el-form-item label="博客摘要">
         <el-input v-model="blogData.summary" type="textarea" rows="10" placeholder="Summary"></el-input>
       </el-form-item>
@@ -35,9 +39,7 @@
 
       <el-form-item label="博客分类">
         <el-select v-model="blogData.category" placeholder="请选择博客分类">
-          <el-option label="前端" value="前端"/>
-          <el-option label="后端" value="后端"/>
-          <el-option label="计算机" value="计算机"/>
+          <el-option v-for="category in categories" :label="category.categoryName" :value="category.categoryName"></el-option>
         </el-select>
       </el-form-item>
 
@@ -92,21 +94,17 @@
 </template>
 
 <script setup lang="ts">
-import {nextTick, onMounted, reactive, ref} from "vue";
+import {nextTick, onBeforeMount, onMounted, reactive, ref} from "vue";
 import {ElInput, genFileId, UploadFile, UploadFiles, UploadInstance, UploadProps, UploadRawFile} from "element-plus";
 import {ElNotification} from "element-plus/es";
+import blog from "../../api/blog";
+import {BlogDto} from "../../model/blog";
+import Blog from "../../api/blog";
+import {categoryDataType, categoryDto} from "../../model/category";
 
 /*表单数据*/
-let blogData = reactive({
-  title: '',
-  summary: '',
-  author: '',
-  isTop: false,
-  tags: [],
-  date: '',
-  time: '',
-  category: ''
-});
+const blogData:BlogDto = reactive<BlogDto>(new BlogDto());
+const categories:categoryDataType[] = reactive([]);
 
 const tagInputVisible = ref(false);
 const TagInputRef = ref<InstanceType<typeof ElInput>>();
@@ -152,6 +150,33 @@ const onSubmit = () => {
   upload.value!.submit();
   console.log(blogData)
 };
+
+onBeforeMount(()=>{
+  blog.getAllCategory().then(res=>{
+    const data = res.data;
+    if (data.success) {
+      const response:categoryDataType[] = data.data;
+      response.forEach(item => categories.push(item));
+    } else {
+      ElNotification({
+        title: "Error",
+        message: data.message,
+        type: "error"
+      });
+    }
+  },reason => {
+    ElNotification({
+      title:"Error",
+      message:reason.message,
+      type:"error"
+    })
+  }).catch(err=>{ElNotification({
+    title:"Error",
+    message:err.message,
+    type:"error"
+  })});
+})
+
 </script>
 
 <style scoped>

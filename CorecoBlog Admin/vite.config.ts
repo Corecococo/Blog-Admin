@@ -28,7 +28,17 @@ export default defineConfig({
     server:{
         port: 8888,
         https: true,
-        open: true,
-        host:true
+        host:true,
+        //配置代理
+        proxy:{
+            '/dev-apis':{
+                target:'https://192.168.31.24:7019',
+                //不验证SSL安全证书
+                secure:false,
+                changeOrigin:true,
+                rewrite: (path) => path.replace(/^\/dev-apis\//, '')
+            }
+        },
+        open:true
     }
 })

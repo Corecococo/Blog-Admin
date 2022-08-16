@@ -179,7 +179,7 @@ const rankEchartsRef = ref();
 const handleTabsClick = (tab: TabsPaneContext, event: Event) => {
 /*如果是阅读数量面板，绘制echart*/
   if (tab.props.label === "阅读数量") {
-    /*这里加个小延迟是为了让虚拟dom容器先渲染出来，然后在挂载echart图标，因为js是异步执行
+    /*这里加个小延迟是为了让虚拟dom容器先渲染出来，然后在挂载echart图表，因为js是异步执行
     的，如果不加延迟可能echart挂载的时候，其虚拟DOM容器还没渲染完成，导致echart挂载失败 */
     setTimeout(()=>{let readEchart = echarts.init(readEchartRef.value);
       initBarEchart(readEchart);
@@ -302,6 +302,8 @@ onMounted(()=>{
   window.onresize = () => {
     visitorEchart.resize();
     percentEchart.resize();
+    percentEchart.resize();
+    rankEchart.resize();
   };
 })
 

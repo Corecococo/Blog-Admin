@@ -9,7 +9,9 @@
         <el-icon :size="'1.25rem'"><Search /></el-icon>
       </div>
       <div class="header-nav-item">
-        <el-icon :size="'1.25rem'"><Bell /></el-icon>
+        <el-badge is-dot="true">
+          <el-icon :size="'1.25rem'"><Bell /></el-icon>
+        </el-badge>
       </div>
       <div class="header-nav-item">
         <el-dropdown>
@@ -23,9 +25,9 @@
         </el-dropdown>
 
       </div>
-      <div class="header-nav-item">
+<!--      <div class="header-nav-item">
         <el-icon :size="'1.25rem'"><Setting /></el-icon>
-      </div>
+      </div>-->
     </div>
   </div>
 </template>

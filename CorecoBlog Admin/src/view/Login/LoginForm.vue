@@ -26,11 +26,14 @@ import {useRouter} from "vue-router";
 import {ref} from "vue";
 import {ElMessage} from "element-plus";
 import {ElNotification} from "element-plus/es";
+import account from "../../api/account";
 
 let isLoading = ref(false);
 let user = ref("");
 let password = ref("");
 let router = useRouter();
+
+//点击登录
 let login = () => {
   //先进行表单验证
   if (user.value===""||password.value===""){
@@ -42,9 +45,37 @@ let login = () => {
   }else{
     isLoading.value = true;
     setTimeout(() => {
-      console.log('redirect');
-      router.push("/coco/home");
-    }, 1000);
+      account.Login(user.value,password.value,"").then(res=>{
+        const data = res.data;
+        if (data.success){
+          console.log(data.response)
+          localStorage.setItem('access_token',data.response);
+          router.push('/coco/home')
+        }else{
+          isLoading.value=false;
+          ElNotification({
+            title: "Error",
+            message: data.message,
+            type:"error"
+          });
+        }
+      },reason => {
+        isLoading.value=false;
+        ElNotification({
+          title: "Error",
+          message: "与服务器连接超时！",
+          type:"error"
+        });
+      }).catch(err=>{
+        isLoading.value=false;
+        ElNotification({
+          title: "Error",
+          message: "服务器内部错误",
+          type:"error"
+        });
+      });
+      //router.push("/coco/home");
+    }, 500);
   }
 
 }
