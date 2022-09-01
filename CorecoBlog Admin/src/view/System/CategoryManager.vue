@@ -18,7 +18,7 @@
       </template>
     </el-table-column>
   </el-table>
-  <el-button size="small" type="primary" @click="dialogVisible=true">创建分类</el-button>
+  <el-button size="small" type="primary" @click="showCreateDialog">创建分类</el-button>
   <el-dialog
       v-model="dialogVisible"
       :title=dialogTitle
@@ -38,7 +38,7 @@
 </template>
 
 <script setup lang="ts">
-import {Ref, ref, reactive, onMounted, nextTick} from "vue";
+import {Ref, ref, reactive, onMounted, nextTick, onBeforeMount} from "vue";
 import blog from "../../api/blog";
 import {ElNotification} from "element-plus/es";
 import {categoryDataType, categoryDto} from "../../model/category";
@@ -47,7 +47,7 @@ const categoryName = ref("");
 let categoryData:categoryDataType[] = reactive([]);
 const index = ref(1);
 const dialogTitle = ref("创建分类");
-const editCategoryId = ref("");
+const editCategoryUUId = ref("");
 
 //创建或编辑分类
 const createOrEditCategory = (categoryName:string)=>{
@@ -90,7 +90,7 @@ const createOrEditCategory = (categoryName:string)=>{
       dialogVisible.value=false;
     }
   }else if(dialogTitle.value==="编辑分类"){
-    blog.updateCategory(categoryName,editCategoryId.value).then(res=>{
+    blog.updateCategory(categoryName,editCategoryUUId.value).then(res=>{
       const data = res.data;
       if (data.success){
         ElNotification({
@@ -100,7 +100,7 @@ const createOrEditCategory = (categoryName:string)=>{
         });
         dialogVisible.value = false;
         categoryData.forEach((item,index,arr)=>{
-          if (item.id===editCategoryId.value){
+          if (item.uuid===editCategoryUUId.value){
             item.categoryName=categoryName;
           }
         });
@@ -190,12 +190,19 @@ const deleteCategory = (row:any) => {
 
 //显示编辑分类的dialog
 const showEditCategoryDialog = (row:any)=>{
-  editCategoryId.value = row.id;
-  console.log(editCategoryId);
+  editCategoryUUId.value = row.uuid;
+  categoryName.value = row.categoryName;
   dialogTitle.value = "编辑分类";
   dialogVisible.value = true;
 }
-onMounted(()=>{
+
+//显示创建分类的dialog
+const showCreateDialog=()=>{
+  dialogTitle.value="创建分类";
+  categoryName.value="";
+  dialogVisible.value =true;
+}
+onBeforeMount(()=>{
   getAllCategory();
 });
 

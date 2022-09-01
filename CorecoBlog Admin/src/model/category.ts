@@ -1,5 +1,6 @@
 export interface categoryDataType{
-    id:string,
+    id:Number,
+    uuid:string,
     categoryName:string,
     number:number,
     index:number

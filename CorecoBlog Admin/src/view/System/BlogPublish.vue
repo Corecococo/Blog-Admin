@@ -19,7 +19,7 @@
       <el-form-item label="发布时间">
         <el-col :span="11">
           <el-date-picker
-              v-model="blogData.date"
+              v-model="blogData.publishDate"
               type="date"
               placeholder="Pick a date"
               style="width: 100%"
@@ -30,7 +30,7 @@
         </el-col>
         <el-col :span="11">
           <el-time-picker
-              v-model="blogData.time"
+              v-model="blogData.publishTime"
               placeholder="Pick a time"
               style="width: 100%"
           />
@@ -72,17 +72,18 @@
       <el-form-item label="博客上传">
         <el-upload
             ref="upload"
-            action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+            action="none"
             :limit="1"
             :on-exceed="handleExceed"
             :auto-upload="false"
             :on-success="showUploadResult"
+            :file-list="blogData.blogFile"
         >
           <template #trigger>
             <el-button type="primary" size="small">Select File</el-button>
           </template>
           <template #tip>
-            <div class="el-upload__tip" style="color: var(--el-text-color-placeholder)">只能上传一个md文件，新选择的文件会替换旧文件</div>
+            <div class="el-upload__tip" style="color: var(--el-text-color-placeholder)">只能按约定上传一个zip文件</div>
           </template>
         </el-upload>
       </el-form-item>
@@ -131,6 +132,7 @@ let showTagInput = () => {
 /*文件上传*/
 const upload = ref<UploadInstance>();
 let handleExceed:UploadProps['onExceed'] = (files)=>{
+  /*!.是断言语法糖，意为upload.value一定有clearFiles()方法*/
   upload.value!.clearFiles();
   const file = files[0] as UploadRawFile;
   file.uid = genFileId();
@@ -147,11 +149,57 @@ const showUploadResult: UploadProps['onSuccess'] = (resp: any, uploadFile: Uploa
 /*提交表单*/
 
 const onSubmit = () => {
-  upload.value!.submit();
-  console.log(blogData)
+  let allTagsStr = "";
+  let formFiles = [];
+  for (let i = 0; i < blogData.tags.length; i++) {
+    allTagsStr+=blogData.tags[i] + ",";
+  }
+
+  blogData.tags = allTagsStr;
+  //当json对象要和二进制数据(文件)一起提交至后端时，必须使用FormData对象，否则后端进行模型绑定时将失败，即使手动设置了Conten-Type也会失败
+  let formData = new FormData();
+  formData.append('title', blogData.title);
+  formData.append('author', blogData.author);
+  formData.append('contribution', blogData.contribution);
+  formData.append('summary', blogData.summary);
+  //日期和时间在进行表单提交时，必须格式化为字符串，toISOString()方法返回YYYY-MM-DDTHH:mm:ss.sssZ格式字符串，且会将时区设定为UTC时区
+  formData.append('publishDate', blogData.publishDate.toISOString());
+  formData.append('publishTime', blogData.publishTime.toISOString());
+  formData.append('category', blogData.category);
+  formData.append('tags', blogData.tags);
+  formData.append('blogFile', blogData.blogFile[0]?.raw);
+  blog.addBlog(formData).then(res=>{
+    const data = res.data;
+    if (data.success){
+      ElNotification({
+        title:"Success",
+        message:data.message,
+        type:"success"
+      });
+    }else {
+      ElNotification({
+        title:"Fail",
+        message:data.message,
+        type:"error"
+      });
+    }
+  },reason => {
+    ElNotification({
+      title:"Fail",
+      message:reason.message,
+      type:"error"
+    });
+  }).catch(err=>{
+    ElNotification({
+      title:"Error",
+      message:err.message,
+      type:"error"
+    });
+  });
 };
 
 onBeforeMount(()=>{
+  //挂载前获取现有分类信息
   blog.getAllCategory().then(res=>{
     const data = res.data;
     if (data.success) {

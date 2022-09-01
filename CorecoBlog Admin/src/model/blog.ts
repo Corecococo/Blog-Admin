@@ -1,24 +1,33 @@
+import {UploadUserFile} from "element-plus";
+
 export interface BlogDtoInterface{
-    title:string|undefined,
-    author:string|undefined,
-    contribution:string|undefined,
-    summary:string|undefined,
-    publishDate:Date|undefined,
-    publishTime:Date|undefined,
-    category:string|undefined,
-    tags:string[],
-    blogFile:File|null,
+    title:any,
+    author:any,
+    contribution:any,
+    summary:any,
+    publishDate:any,
+    publishTime:any,
+    category:any,
+    tags:any,
+    blogFile:any,
+    index:Number,
+    traffic:Number,
+    url:any,
+    uuid:string
 }
 
 export class BlogDto implements BlogDtoInterface{
-    author: string | undefined = undefined;
-    blogFile: File | null = null;
-    category: string | undefined = undefined;
-    contribution: string | undefined = undefined;
-    publishDate: Date | undefined = undefined;
-    publishTime: Date | undefined = undefined;
-    summary: string | undefined =undefined;
-    tags: string[]  = [];
-    title: string | undefined = undefined;
-
+    author: any  = undefined;
+    blogFile: any = [];
+    category: any = undefined;
+    contribution: any  = undefined;
+    publishDate: any  = undefined;
+    publishTime: any  = undefined;
+    summary: any  =undefined;
+    tags: any = [];
+    title: any  = undefined;
+    index:Number =1;
+    traffic:Number =0;
+    url:any="";
+    uuid:string="";
 }
